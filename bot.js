@@ -131,38 +131,42 @@ function requestCommandListing(arg, args, message)
 // assign a color role to a user
 function requestColorRole(arg, args, message)
 {
-	// get the case-retaining role name
-	const roles = config.colorRoles.filter(role => role.toLowerCase() === arg.trim().toLowerCase());
-	if(roles.length)
+	if(message.guild)
 	{
-		// get the role name
-		// get the role itself
-		const roleName = roles[0];
-		const role = message.guild.roles.find("name", roleName);
+		// get the case-retaining role name
+		const roles = config.colorRoles.filter(role => role.toLowerCase() === arg.trim().toLowerCase());
+		if(roles.length)
+		{
+			// get the role name
+			// get the role itself
+			const roleName = roles[0];
+			const role = message.guild.roles.find("name", roleName);
 
-		// see if they already have the role or not
-		if(message.member.roles.has(role.id))
-		{
-			// remove the role since they have it already
-			message.member.removeRole(role).then(() => {
-				reply(message, `You no longer have the ${roleName} color role.`);
-			}).catch(console.error);
+			// see if they already have the role or not
+			if(message.member.roles.has(role.id))
+			{
+				// remove the role since they have it already
+				message.member.removeRole(role).then(() => {
+					reply(message, `You no longer have the ${roleName} color role.`);
+				}).catch(console.error);
+			}
+			else
+			{
+				// remove all other color roles first
+				config.colorRoles.forEach(roleName => {
+					const role = message.guild.roles.find("name", roleName);
+					if(message.member.roles.has(role.id))
+						message.member.removeRole(role).catch(console.error);
+				});
+				// then add this color
+				message.member.addRole(role).then(() => {
+					reply(message, `You now have the ${roleName} color role!`);
+				}).catch(console.error);
+			}
 		}
-		else
-		{
-			// remove all other color roles first
-			config.colorRoles.forEach(roleName => {
-				const role = message.guild.roles.find("name", roleName);
-				if(message.member.roles.has(role.id))
-					message.member.removeRole(role).catch(console.error);
-			});
-			// then add this color
-			message.member.addRole(role).then(() => {
-				reply(message, `You now have the ${roleName} color role!`);
-			}).catch(console.error);
-		}
+		else sendBotString("onUnknownColorRole", msg => reply(message, msg));
 	}
-	else sendBotString("onUnknownColorRole", msg => reply(message, msg));
+	else sendBotString("guildOnlyCommand", msg => reply(message, msg));
 }
 
 // respond with list of color roles

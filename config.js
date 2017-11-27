@@ -90,7 +90,12 @@ config.botStrings = {
 	},
 	// when you try to assign an unknown color role
 	"onUnknownColorRole": {
-		string: "I'm sorry, that color isn't available! (See `-colors`)",
+		string: "I'm sorry, that color isn't available! (See `${config.trigger}colors`)",
+		enabled: true,
+	},
+	// when you try a command that is only allowed in guilds
+	"guildOnlyCommand": {
+		string: "You can only use that command in servers!",
 		enabled: true,
 	},
 	// when you try a command that the bot doesn't know
