@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-// load discord.js and create a client object
+// load discord.js and other libs and create a client object
+const request = require("request");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -176,6 +177,29 @@ function requestColorRoleListing(arg, args, message)
         sendBotString("onColorRoleListingRequest", msg => reply(message, msg), msg => message.channel.send(msg), `\n${ls}`);
 }
 
+// respond with latest overwatch news posts
+function requestOverwatchNews(arg, args, message)
+{
+	request("https://news.blizzard.com/en-us/overwatch", (error, response, body) => {
+		if(error) console.error(error);
+		else
+		{
+			// scrape overwatch news article links
+			const posts = body.split('<div class="ArticleListItem">').slice(1)
+				.filter(s => s.trim().startsWith('<a href="/en-us/overwatch/'))
+				.map(s => {
+					return {
+						url: "https://news.blizzard.com" + s.split('"')[1],
+						title: s.split('"ArticleListItem-title">')[1].split("<")[0],
+					};
+				});
+			const ls = posts.map((post, i) => `${i + 1}. ${post.title} (${post.url})`);
+			const latest = ls.slice(0, 5);
+        		sendBotString("onOverwatchNewsRequest", msg => reply(message, msg), msg => message.channel.send(msg), `\n${latest.join("\n")}`);
+		}
+	});
+}
+
 // map of commands
 const commands = {};
 
@@ -194,6 +218,7 @@ registerCommand(config.commands.requestInfo.aliases, requestInfo);
 registerCommand(config.commands.requestCommandListing.aliases, requestCommandListing);
 registerCommand(config.commands.colorRole.aliases, requestColorRole);
 registerCommand(config.commands.colorRoleList.aliases, requestColorRoleListing);
+registerCommand(config.commands.overwatchNews.aliases, requestOverwatchNews);
 
 // executes a command
 // given cmd name, arg string, args list, and originating discord message

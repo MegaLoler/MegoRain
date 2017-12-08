@@ -42,6 +42,10 @@ config.commands.colorRoleList = {
 	aliases: ["colors", "colorlist", "colorroles", "colorrolelist"],
 	description: "See what color roles there are",
 };
+config.commands.overwatchNews = {
+	aliases: ["own", "overwatch", "news", "overwatchnews"],
+	description: "See the latest Overwatch news posts",
+};
 
 // help message
 const helpString = `This is **${config.botName}**!
@@ -86,6 +90,11 @@ config.botStrings = {
 	// when you ask for what color roles there are
 	"onColorRoleListingRequest": {
 		string: "Here are the color roles you can get:",
+		enabled: true,
+	},
+	// when you ask for latest overwatch news
+	"onOverwatchNewsRequest": {
+		string: "Here are the latest Overwatch news articles:",
 		enabled: true,
 	},
 	// when you try to assign an unknown color role
